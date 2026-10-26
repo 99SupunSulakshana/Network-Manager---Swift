@@ -9,6 +9,7 @@ import SwiftUI
 
 struct QuotesScreen: View {
     @State private var quotes: [Quote]? = nil
+    let manager = NetworkManager.shared
     
     var body: some View {
         Group {
@@ -34,39 +35,12 @@ struct QuotesScreen: View {
                 ContentUnavailableView("No Quotes available", systemImage: "quote.closing")
             }
         }.task {
-            quotes = await fetchAndDecodeQuotes(from: TestURL.quotesURL)
+            quotes = await manager.fetchAndDecodeJSON(from: TestURL.quotesURL)
         }
     }
     
-    func fetchAndDecodeQuotes(from url:String) async -> [Quote]? {
-        guard let url = URL(string: url) else {
-            print("Invalid URL")
-            return nil
-        }
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(from: url)
-            guard let httpResponse = response as? HTTPURLResponse else {
-                print("Network error: Response was not HTTPURLResponse")
-                return nil
-            }
-            guard (200...209).contains(httpResponse.statusCode) else {
-                print("HTTP error: status code \(httpResponse.statusCode)")
-                return nil
-            }
-            
-            do {
-                let decoder = JSONDecoder()
-                return try decoder.decode([Quote].self, from: data)
-            }catch {
-                print("Decoding error: \(error.localizedDescription)")
-                return nil
-            }
-        } catch{
-            print("Request error: \(error.localizedDescription)")
-            return nil
-        }
-    }
+
+    
 }
 
 #Preview {

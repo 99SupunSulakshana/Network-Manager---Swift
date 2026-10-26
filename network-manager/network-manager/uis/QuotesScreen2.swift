@@ -7,12 +7,19 @@
 
 import SwiftUI
 
+struct QuotesPlus: Decodable {
+    let lastUpdated: Date
+    let quotes: [Quote]
+}
+
 struct QuotesScreen2: View {
-    @State private var quotes: [Quote]? = nil
+    @State private var quotePlus: QuotesPlus? = nil
+    let manager = NetworkManager.shared
     var body: some View {
         Group {
-            if let quotes {
-                List(quotes.shuffled()) { quote in
+            if let quotePlus {
+                Text(quotePlus.lastUpdated, format: .dateTime.month().day().year())
+                List(quotePlus.quotes.shuffled()) { quote in
                     VStack(alignment: .leading, spacing: 6) {
                         Text(quote.text)
                             .font(.headline)
@@ -32,6 +39,9 @@ struct QuotesScreen2: View {
             } else {
                 ContentUnavailableView("No Quotes available", systemImage: "quote.closing")
             }
+        }
+        .task {
+            quotePlus = await manager.fetchAndDecodeJSON(from: TestURL.quotes2URL)
         }
     }
 }

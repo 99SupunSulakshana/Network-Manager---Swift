@@ -9,6 +9,7 @@ import SwiftUI
 
 struct JokesScreen: View {
     @State private var jokes: [Joke]? = nil
+    let manager = NetworkManager.shared
     var body: some View {
         Group {
             if let jokes {
@@ -24,6 +25,9 @@ struct JokesScreen: View {
             } else {
                 ContentUnavailableView("No Jokes available", systemImage: "hand.thumbsdown.fill")
             }
+        }
+        .task {
+            jokes = await manager.fetchAndDecodeJSON(from: TestURL.jokesURL)
         }
     }
 }
