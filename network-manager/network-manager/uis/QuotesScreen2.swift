@@ -13,11 +13,11 @@ struct QuotesPlus: Decodable {
 }
 
 struct QuotesScreen2: View {
-    @State private var quotePlus: QuotesPlus? = nil
-    let manager = NetworkManager.shared
+    @State private var viewModel = DataViewModel<QuotesPlus>(url: TestURL.quotes2URL)
+    
     var body: some View {
         Group {
-            if let quotePlus {
+            if let quotePlus = viewModel.data {
                 Text(quotePlus.lastUpdated, format: .dateTime.month().day().year())
                 List(quotePlus.quotes.shuffled()) { quote in
                     VStack(alignment: .leading, spacing: 6) {
@@ -35,14 +35,34 @@ struct QuotesScreen2: View {
                     }
                     .padding(.vertical, 4)
                 }
+                .refreshable {
+                    Task {
+                        await viewModel.fetchData()
+                    }
+                }
                 .listStyle(.plain)
             } else {
                 ContentUnavailableView("No Quotes available", systemImage: "quote.closing")
             }
         }
+        .withLoader(isLoading: viewModel.isLoading, title: "Quotes")
         .task {
-            quotePlus = await manager.fetchAndDecodeJSON(from: TestURL.quotes2URL)
+            await viewModel.fetchData()
         }
+        .alert(
+            "Unable to load quates.",
+            isPresented: Binding(get: {
+                viewModel.networkManagerError != nil
+            }, set: { value in
+                if !value { viewModel.networkManagerError = nil }
+            }),
+            presenting: viewModel.networkManagerError) { _ in
+                Button("OK"){
+                    
+                }
+            } message: { networkError in
+                Text(networkError.userMessage)
+            }
     }
 }
 

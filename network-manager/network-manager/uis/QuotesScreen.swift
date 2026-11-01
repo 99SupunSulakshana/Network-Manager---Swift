@@ -8,40 +8,59 @@
 import SwiftUI
 
 struct QuotesScreen: View {
-    @State private var quotes: [Quote]? = nil
-    let manager = NetworkManager.shared
+    @State private var viewModel = DataViewModel<[Quote]>(url: TestURL.quotesURL)
     
     var body: some View {
         Group {
-            if let quotes {
-                List(quotes.shuffled()) { quote in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(quote.text)
-                            .font(.headline)
-                        HStack {
-                            Text(quote.author)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                            Spacer()
-                            Text(quote.entryDate, format: .dateTime.month().day().year())
-                                .font(.caption)
-                                .foregroundStyle(.tertiary)
+                if let quotes = viewModel.data, !quotes.isEmpty {
+                    List(quotes.shuffled()) { quote in
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(quote.text)
+                                .font(.headline)
+                            HStack {
+                                Text(quote.author)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Text(quote.entryDate, format: .dateTime.month().day().year())
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
                         }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
+                    .listStyle(.plain)
+                    .refreshable {
+                        Task {
+                            await viewModel.fetchData()
+                        }
+                        }
+                } else {
+                    ContentUnavailableView("No Quotes available", systemImage: "quote.closing")
                 }
-                .listStyle(.plain)
-            } else {
-                ContentUnavailableView("No Quotes available", systemImage: "quote.closing")
-            }
-        }.task {
-            quotes = await manager.fetchAndDecodeJSON(from: TestURL.quotesURL)
         }
+        .withLoader(isLoading: viewModel.isLoading, title: "quates")
+        .task {
+            await viewModel.fetchData()
+        }
+        .alert(
+            "Unable to load quates.",
+            isPresented: Binding(get: {
+                viewModel.networkManagerError != nil
+            }, set: { value in
+                if !value { viewModel.networkManagerError = nil}
+            }),
+            presenting: viewModel.networkManagerError) { _ in
+                Button("OK"){
+                    
+                }
+            } message: { networkError in
+                Text(networkError.userMessage)
+            }
     }
-    
-
-    
 }
+
+
 
 #Preview {
     NavigationStack {
