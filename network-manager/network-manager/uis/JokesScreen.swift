@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct JokesScreen: View {
-    @State private var viewModel = DataViewModel<[Joke]>(url: TestURL.jokesURL)
+    @State private var viewModel = DataViewModel<[Joke]>(endPoint: TestEndPoint.jokesEndPoint)
     
     var body: some View {
         Group {

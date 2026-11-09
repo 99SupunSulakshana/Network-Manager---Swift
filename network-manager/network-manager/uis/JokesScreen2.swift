@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct JokesScreen2 : View {
-    @State private var viewModel = DataViewModel<[Joke2]>(url: TestURL.jokesURL){
+    @State private var viewModel = DataViewModel<[Joke2]>(endPoint: TestEndPoint.jokesEndPoint){
         decoder in
         decoder.dateDecodingStrategy = .iso8601
     }

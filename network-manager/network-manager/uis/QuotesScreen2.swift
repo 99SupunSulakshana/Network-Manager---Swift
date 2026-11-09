@@ -13,7 +13,7 @@ struct QuotesPlus: Decodable {
 }
 
 struct QuotesScreen2: View {
-    @State private var viewModel = DataViewModel<QuotesPlus>(url: TestURL.quotes2URL)
+    @State private var viewModel = DataViewModel<QuotesPlus>(endPoint: TestEndPoint.quotes2EndPoint)
     
     var body: some View {
         Group {

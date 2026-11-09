@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct network_managerApp: App {
+    @State private var usersModel = UserViewModel()
     var body: some Scene {
         WindowGroup {
-            StartScreen()
+            UsersScreen()
+                .environment(usersModel)
         }
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct QuotesScreen: View {
-    @State private var viewModel = DataViewModel<[Quote]>(url: TestURL.quotesURL)
+    @State private var viewModel = DataViewModel<[Quote]>(endPoint: TestEndPoint.quotesEndPoint)
     
     var body: some View {
         Group {

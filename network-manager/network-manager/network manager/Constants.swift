@@ -15,4 +15,15 @@ enum TestURL {
     static let jokesURL = "https://stewartlynch.github.io/Samples/jokes.json"
     
     static let quotes2URL = "https://stewartlynch.github.io/Samples/quotes2.json"
+    static let gorestURL = "https://gorest.co.in/public/v3/users"
 }
+
+
+enum TestEndPoint {
+    static var jokesEndPoint = Endpoint(urlString: TestURL.jokesURL, method: .get)
+    static var userWithHeader = Endpoint(urlString: TestURL.gorestURL, method: .get)
+    static var quotesEndPoint = Endpoint(urlString: TestURL.quotesURL, method: .get)
+    static var quotes2EndPoint = Endpoint(urlString: TestURL.quotes2URL, method: .get)
+}
+
+let token = ""
