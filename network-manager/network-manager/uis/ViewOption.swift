@@ -9,7 +9,7 @@ import SwiftUI
 
 enum ViewOption: CaseIterable, Identifiable, View {
     
-    case first, second, third, fourth
+    case first, second, third, fourth, fifth
     var id: Self { self }
     
     var title: String {
@@ -22,6 +22,8 @@ enum ViewOption: CaseIterable, Identifiable, View {
             "Quotes Dictionary"
         case .fourth:
             "Joke + EntryData"
+        case .fifth:
+            "Post"
         }
     }
     
@@ -35,6 +37,8 @@ enum ViewOption: CaseIterable, Identifiable, View {
             "Quotes Dictionary"
         case .fourth:
             "Joke + EntryData"
+        case .fifth:
+            "Post"
         }
     }
     
@@ -49,6 +53,8 @@ enum ViewOption: CaseIterable, Identifiable, View {
             QuotesScreen2()
         case .fourth:
             JokesScreen2()
+        case .fifth:
+            PostView()
         }
     }
 }

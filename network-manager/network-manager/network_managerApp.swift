@@ -12,7 +12,7 @@ struct network_managerApp: App {
     @State private var usersModel = UserViewModel()
     var body: some Scene {
         WindowGroup {
-            UsersScreen()
+            StartScreen()
                 .environment(usersModel)
         }
     }

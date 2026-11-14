@@ -23,6 +23,7 @@ enum NetworkManagerError: Error {
             case 401: "Session has expired."
             case 403: "You don't have permission to do that."
             case 404: "Not found."
+            case 422: "Some of the details are invalid (for example, the email may already be in use)."
             case 429: "Too many requests. Please wait a moment and try again."
             case 500...599: "The server is having trouble, Please try again later."
             default: "Somethingh went wrong. Please try again."
@@ -89,8 +90,9 @@ class NetworkManager {
                 print("Network error: Response was not HTTPURLResponse")
                 throw NetworkManagerError.httpResponse
             }
-            guard (200...209).contains(httpResponse.statusCode) else {
+            guard (200...299).contains(httpResponse.statusCode) else {
                 print("HTTP error: status code \(httpResponse.statusCode)")
+                print("Response body: \(String(data: data, encoding: .utf8) ?? "<non-UTF8 body>")")
                 throw NetworkManagerError.httpStatusCode(httpResponse.statusCode)
             }
             
@@ -124,14 +126,35 @@ class NetworkManager {
         configureDecoder: ((JSONDecoder) -> ())? = nil
     ) async throws(NetworkManagerError) -> T {
         let request = try endPoint.buildRequest()
+        return try await executedAndDecodeJSON(from: request, configureDecoder: configureDecoder)
+    }
+    
+    func sendJSONAndDecodeRespose<T: Decodable, Payload: Encodable>(
+        from endPoint: Endpoint,
+        payload: Payload,
+        configureDecoder: ((JSONDecoder) -> ())? = nil
+    ) async throws(NetworkManagerError) -> T {
+        var request = try endPoint.buildRequest()
+        guard let encodedPayload = try? JSONEncoder().encode(payload) else {
+            fatalError("Unable to encode payload")
+        }
+        request.httpBody = encodedPayload
+        return try await executedAndDecodeJSON(from: request, configureDecoder: configureDecoder)
+    }
+      
+    func executedAndDecodeJSON<T: Decodable>(
+        from request: URLRequest,
+        configureDecoder: ((JSONDecoder) -> ())? = nil
+    ) async throws(NetworkManagerError) -> T {
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             guard let httpResponse = response as? HTTPURLResponse else {
                 print("Network error: Response was not HTTPURLResponse")
                 throw NetworkManagerError.httpResponse
             }
-            guard (200...209).contains(httpResponse.statusCode) else {
+            guard (200...299).contains(httpResponse.statusCode) else {
                 print("HTTP error: status code \(httpResponse.statusCode)")
+                print("Response body: \(String(data: data, encoding: .utf8) ?? "<non-UTF8 body>")")
                 throw NetworkManagerError.httpStatusCode(httpResponse.statusCode)
             }
             

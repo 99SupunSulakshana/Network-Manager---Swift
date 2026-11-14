@@ -24,6 +24,7 @@ enum TestEndPoint {
     static var userWithHeader = Endpoint(urlString: TestURL.gorestURL, method: .get)
     static var quotesEndPoint = Endpoint(urlString: TestURL.quotesURL, method: .get)
     static var quotes2EndPoint = Endpoint(urlString: TestURL.quotes2URL, method: .get)
+    static var createUser = Endpoint(urlString: TestURL.gorestURL, method: .post)
 }
 
 let token = ""
