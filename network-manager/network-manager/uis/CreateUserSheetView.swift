@@ -116,7 +116,7 @@ struct CreateUserSheetView: View {
         do {
             if let user {
                 try await model.updateUser(
-                    id: Int(user.id) ?? 0,
+                    id: user.id,
                     name: name,
                     email: email,
                     status: status

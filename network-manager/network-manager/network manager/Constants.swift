@@ -25,8 +25,11 @@ enum TestEndPoint {
     static var quotesEndPoint = Endpoint(urlString: TestURL.quotesURL, method: .get)
     static var quotes2EndPoint = Endpoint(urlString: TestURL.quotes2URL, method: .get)
     static var createUser = Endpoint(urlString: TestURL.gorestURL, method: .post)
-    static func updateUser(id: Int) -> Endpoint {
+    static func updateUser(id: String) -> Endpoint {
         return Endpoint(urlString: "\(TestURL.gorestURL)/\(id)", method: .patch)
+    }
+    static func deleteUser(id: String) -> Endpoint {
+        return Endpoint(urlString: "\(TestURL.gorestURL)/\(id)", method: .delete)
     }
 }
 

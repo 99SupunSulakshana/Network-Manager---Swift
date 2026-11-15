@@ -52,7 +52,7 @@ class UserViewModel {
     }
     
     func updateUser(
-        id: Int,
+        id: String,
         name:String,
         email: String,
         status: User.Status
@@ -82,5 +82,17 @@ class UserViewModel {
         
         try await fetchUsers()
                                                                                   
+    }
+    
+    func deleteUsers(at offsets: IndexSet) async throws(NetworkManagerError) {
+        let ids = offsets.map { users[$0].id }
+        for id in ids {
+            var endpoint = TestEndPoint.deleteUser(id: id)
+            endpoint.addHeader("application/json", forHTTPHeaderField: "Content-Type")
+            endpoint.addHeader("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            endpoint.addHeader("application/json", forHTTPHeaderField: "Accept")
+            try await NetworkManager.shared.sendRequest(from: endpoint)
+        }
+        try await fetchUsers()
     }
 }

@@ -27,9 +27,13 @@ struct PutPatchView: View {
             }
             .strikethrough(user.status == .inactive)
             .contentShape(Rectangle())
+            .refreshable {
+                
+            }
             .onTapGesture {
                 selectedUser = user
             }
+
         }
         .listStyle(.plain)
         .sheet(item: $selectedUser){ user in
@@ -42,5 +46,6 @@ struct PutPatchView: View {
                 print(error.localizedDescription)
             }
         }
+        
     }
 }

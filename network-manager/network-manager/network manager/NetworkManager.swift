@@ -141,6 +141,33 @@ class NetworkManager {
         request.httpBody = encodedPayload
         return try await executedAndDecodeJSON(from: request, configureDecoder: configureDecoder)
     }
+    
+    func sendRequest (
+        from endpoint: Endpoint
+    ) async throws(NetworkManagerError) {
+        let request = try endpoint.buildRequest()
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("Network error: Response was not HTTPURLResponse")
+                throw NetworkManagerError.httpResponse
+            }
+            guard (200...299).contains(httpResponse.statusCode) else {
+                print("HTTP error: status code \(httpResponse.statusCode)")
+                print("Response body: \(String(data: data, encoding: .utf8) ?? "<non-UTF8 body>")")
+                throw NetworkManagerError.httpStatusCode(httpResponse.statusCode)
+            }
+        } catch let networkError as NetworkManagerError {
+            throw networkError
+        }
+        catch let urlError as URLError {
+            throw NetworkManagerError.request(TransportError(urlError: urlError))
+        }
+        catch{
+            print("Request error: \(error.localizedDescription)")
+            throw NetworkManagerError.request(.unkown)
+        }
+    }
       
     func executedAndDecodeJSON<T: Decodable>(
         from request: URLRequest,
